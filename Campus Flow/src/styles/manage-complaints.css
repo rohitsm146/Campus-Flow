@@ -1,0 +1,277 @@
+.complaint-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.complaint-stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+.complaint-stat-card span {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.complaint-stat-card h2 {
+  margin: 8px 0 0;
+  color: #111827;
+  font-size: 28px;
+}
+
+.complaints-management {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.management-header {
+  padding: 22px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.management-header h2 {
+  margin: 0;
+  color: #111827;
+}
+
+.management-header p {
+  margin: 5px 0 0;
+  color: #6b7280;
+}
+
+.management-header > span {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.complaint-table {
+  width: 100%;
+}
+
+.complaint-table-header,
+.complaint-table-row {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1.1fr 1.1fr 0.7fr;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 25px;
+}
+
+.complaint-table-header {
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.complaint-table-row {
+  border-top: 1px solid #e5e7eb;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.complaint-table-row strong {
+  display: block;
+  color: #111827;
+  margin-bottom: 5px;
+}
+
+.complaint-table-row small {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.category-tag {
+  display: inline-block;
+  width: fit-content;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-tag {
+  display: inline-block;
+  width: fit-content;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-tag.pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-tag.progress {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.status-tag.resolved {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-tag.rejected {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.view-btn {
+  border: none;
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.view-btn:hover {
+  background: #dbeafe;
+}
+
+@media (max-width: 1000px) {
+  .complaint-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .complaint-table {
+    overflow-x: auto;
+  }
+
+  .complaint-table-header,
+  .complaint-table-row {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 600px) {
+  .complaint-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .management-header {
+    padding: 20px;
+  }
+}
+.status-select {
+  padding: 7px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: white;
+}
+
+.status-select:focus {
+  outline: none;
+}
+
+.complaint-details {
+  margin-top: 25px;
+  background: white;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.details-header h2 {
+  margin: 0 0 5px;
+}
+
+.details-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.close-details-btn {
+  border: none;
+  background: #f3f4f6;
+  color: #374151;
+  padding: 9px 18px;
+  border-radius: 7px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.close-details-btn:hover {
+  background: #e5e7eb;
+}
+
+.details-content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.detail-item span {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.detail-item strong {
+  color: #111827;
+}
+
+.detail-item p {
+  margin: 0;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.detail-item select {
+  width: fit-content;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.no-complaints-admin {
+  padding: 30px;
+  text-align: center;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .details-content {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+}

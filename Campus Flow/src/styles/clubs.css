@@ -1,0 +1,165 @@
+.page-header {
+  margin-bottom: 25px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 30px;
+  color: #111827;
+}
+
+.page-header p {
+  margin-top: 7px;
+  color: #6b7280;
+}
+
+
+/* Search */
+
+.club-search {
+  margin-bottom: 25px;
+}
+
+.club-search input {
+  width: 100%;
+  max-width: 500px;
+  padding: 13px 16px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.club-search input:focus {
+  border-color: #2563eb;
+}
+
+
+/* Clubs Grid */
+
+.clubs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+
+/* Club Card */
+
+.club-card {
+  background: white;
+  padding: 25px;
+
+  border-radius: 12px;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.club-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.09);
+}
+
+
+/* Icon */
+
+.club-icon {
+  width: 55px;
+  height: 55px;
+
+  border-radius: 12px;
+
+  background: #eff6ff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 28px;
+
+  margin-bottom: 15px;
+}
+
+
+/* Title */
+
+.club-card h2 {
+  margin: 0 0 10px;
+
+  color: #111827;
+  font-size: 21px;
+}
+
+
+/* Description */
+
+.club-card > p {
+  color: #6b7280;
+  line-height: 1.6;
+
+  margin-bottom: 20px;
+}
+
+
+/* Club Information */
+
+.club-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-bottom: 20px;
+
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.club-info strong {
+  color: #111827;
+}
+
+
+/* Join Button */
+
+.join-btn {
+  border: none;
+
+  background: #2563eb;
+  color: white;
+
+  padding: 10px 20px;
+
+  border-radius: 7px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.join-btn:hover {
+  background: #1d4ed8;
+}
+
+
+/* Responsive */
+
+@media (max-width: 800px) {
+  .clubs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .club-card {
+    padding: 20px;
+  }
+}
