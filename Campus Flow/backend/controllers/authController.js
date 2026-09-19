@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// REGISTER
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -12,7 +13,12 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail =
+      email.trim().toLowerCase();
+
+    const existingUser = await User.findOne({
+      email: normalizedEmail,
+    });
 
     if (existingUser) {
       return res.status(400).json({
@@ -20,17 +26,22 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword =
+      await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      name,
-      email,
+      name: name.trim(),
+      email: normalizedEmail,
       password: hashedPassword,
+
+      // Every newly registered account
+      // is a student.
       role: "student",
     });
 
     res.status(201).json({
       message: "User registered successfully.",
+
       user: {
         id: user._id,
         name: user.name,
@@ -39,6 +50,11 @@ const registerUser = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error(
+      "Registration error:",
+      error
+    );
+
     res.status(500).json({
       message: "Server error.",
       error: error.message,
@@ -46,32 +62,58 @@ const registerUser = async (req, res) => {
   }
 };
 
+// LOGIN
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const {
+      email,
+      password,
+      role,
+    } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
-        message: "Please enter email and password.",
+        message:
+          "Please enter email and password.",
       });
     }
 
-    const user = await User.findOne({ email });
+    const normalizedEmail =
+      email.trim().toLowerCase();
+
+    const user = await User.findOne({
+      email: normalizedEmail,
+    });
 
     if (!user) {
       return res.status(401).json({
-        message: "Invalid email or password.",
+        message:
+          "Invalid email or password.",
       });
     }
 
-    const passwordMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const passwordMatch =
+      await bcrypt.compare(
+        password,
+        user.password
+      );
 
     if (!passwordMatch) {
       return res.status(401).json({
-        message: "Invalid email or password.",
+        message:
+          "Invalid email or password.",
+      });
+    }
+
+    // Verify the role selected on
+    // the login page against the
+    // role stored in MongoDB.
+    if (
+      role &&
+      user.role !== role
+    ) {
+      return res.status(403).json({
+        message: `This account is registered as ${user.role}. Please select ${user.role} login.`,
       });
     }
 
@@ -88,7 +130,9 @@ const loginUser = async (req, res) => {
 
     res.json({
       message: "Login successful.",
+
       token,
+
       user: {
         id: user._id,
         name: user.name,
@@ -97,9 +141,13 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error(
+      "Login error:",
+      error
+    );
+
     res.status(500).json({
-      message: "Server error.",
-      error: error.message,
+    message: "Server error.",
     });
   }
 };

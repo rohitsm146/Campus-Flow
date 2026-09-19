@@ -1,10 +1,9 @@
 import { Navigate } from "react-router-dom";
 
 function ProtectedRoute({ children, allowedRole }) {
-  const token = localStorage.getItem("token");
-  const userData = localStorage.getItem("user");
+  const token = sessionStorage.getItem("token");
+  const userData = sessionStorage.getItem("user");
 
-  // No login information
   if (!token || !userData) {
     return <Navigate to="/" replace />;
   }
@@ -16,22 +15,28 @@ function ProtectedRoute({ children, allowedRole }) {
   } catch (error) {
     console.error("Invalid user data:", error);
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 
     return <Navigate to="/" replace />;
   }
 
-  // Invalid user information
-  if (!user || !user.role) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  if (
+    !user ||
+    !user.id ||
+    !user.role ||
+    !["student", "admin"].includes(user.role)
+  ) {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 
     return <Navigate to="/" replace />;
   }
 
-  // Role protection
-  if (allowedRole && user.role !== allowedRole) {
+  if (
+    allowedRole &&
+    user.role !== allowedRole
+  ) {
     if (user.role === "admin") {
       return (
         <Navigate
@@ -49,8 +54,6 @@ function ProtectedRoute({ children, allowedRole }) {
         />
       );
     }
-
-    return <Navigate to="/" replace />;
   }
 
   return children;

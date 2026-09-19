@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import "../../styles/dashboard.css";
 
 function StudentDashboard() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(
+    sessionStorage.getItem("user")
+  );
 
   const [registeredEvents, setRegisteredEvents] = useState([]);
   const [clubMemberships, setClubMemberships] = useState([]);
@@ -19,7 +21,7 @@ function StudentDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         const eventsResponse = await fetch(
           "http://localhost:5000/api/event-registrations/my",
@@ -135,11 +137,11 @@ function StudentDashboard() {
   }, []);
 
   const handleLogout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 
-  window.location.replace("/");
-};
+    window.location.replace("/");
+  };
 
   const upcomingEvents = events
     .filter((event) => new Date(event.date) >= new Date())
@@ -183,18 +185,18 @@ function StudentDashboard() {
         </nav>
 
         <button
-            className="logout"
-            onClick={handleLogout}
-            style={{
+          className="logout"
+          onClick={handleLogout}
+          style={{
             background: "none",
             border: "none",
             color: "inherit",
             font: "inherit",
             cursor: "pointer",
             padding: 0,
-        }}
+          }}
         >
-        Logout
+          Logout
         </button>
 
       </aside>
@@ -221,7 +223,6 @@ function StudentDashboard() {
 
             <div>
               <strong>{studentName}</strong>
-              <span>Student</span>
               <small>{studentEmail}</small>
             </div>
 

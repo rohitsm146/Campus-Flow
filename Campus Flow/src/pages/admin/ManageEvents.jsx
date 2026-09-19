@@ -18,20 +18,32 @@ function ManageEvents() {
 
   // Registered students from all events
   const [registeredStudents, setRegisteredStudents] = useState([]);
-  const [registrationLoading, setRegistrationLoading] = useState(false);
-  const [registrationError, setRegistrationError] = useState("");
+  const [registrationLoading, setRegistrationLoading] =
+    useState(false);
+  const [registrationError, setRegistrationError] =
+    useState("");
 
   // Get admin user
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(
+    sessionStorage.getItem("user") || "null"
+  );
 
   const adminName = user?.name || "Admin";
   const avatarLetter = adminName.charAt(0).toUpperCase();
+
+  // LOGOUT
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    window.location.replace("/");
+  };
 
   // Fetch events from backend
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         const response = await fetch(
           "http://localhost:5000/api/events",
@@ -45,14 +57,22 @@ function ManageEvents() {
         const data = await response.json();
 
         if (!response.ok) {
-          setError(data.message || "Failed to load events.");
+          setError(
+            data.message || "Failed to load events."
+          );
           return;
         }
 
         setEvents(data);
       } catch (error) {
-        console.error("Error fetching events:", error);
-        setError("Unable to connect to the server.");
+        console.error(
+          "Error fetching events:",
+          error
+        );
+
+        setError(
+          "Unable to connect to the server."
+        );
       } finally {
         setLoading(false);
       }
@@ -73,51 +93,61 @@ function ManageEvents() {
         setRegistrationLoading(true);
         setRegistrationError("");
 
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
-        const registrationRequests = events.map(async (event) => {
-          try {
-            const response = await fetch(
-              `http://localhost:5000/api/event-registrations/event/${event._id}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
+        const registrationRequests =
+          events.map(async (event) => {
+            try {
+              const response = await fetch(
+                `http://localhost:5000/api/event-registrations/event/${event._id}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
+              const data =
+                await response.json();
+
+              if (!response.ok) {
+                console.error(
+                  `Failed to fetch registrations for ${event.title}:`,
+                  data.message
+                );
+
+                return [];
               }
-            );
 
-            const data = await response.json();
+              const registrations =
+                data.registrations || [];
 
-            if (!response.ok) {
+              return registrations.map(
+                (registration) => ({
+                  ...registration,
+                  eventTitle: event.title,
+                })
+              );
+            } catch (error) {
               console.error(
-                `Failed to fetch registrations for ${event.title}:`,
-                data.message
+                `Registration fetch error for ${event.title}:`,
+                error
               );
 
               return [];
             }
+          });
 
-            const registrations = data.registrations || [];
+        const results = await Promise.all(
+          registrationRequests
+        );
 
-            return registrations.map((registration) => ({
-              ...registration,
-              eventTitle: event.title,
-            }));
-          } catch (error) {
-            console.error(
-              `Registration fetch error for ${event.title}:`,
-              error
-            );
+        const allRegistrations =
+          results.flat();
 
-            return [];
-          }
-        });
-
-        const results = await Promise.all(registrationRequests);
-
-        const allRegistrations = results.flat();
-
-        setRegisteredStudents(allRegistrations);
+        setRegisteredStudents(
+          allRegistrations
+        );
       } catch (error) {
         console.error(
           "Error fetching all registrations:",
@@ -152,15 +182,23 @@ function ManageEvents() {
 
     setError("");
 
-    if (!title || !date || !time || !description) {
-      alert("Please fill in all fields.");
+    if (
+      !title ||
+      !date ||
+      !time ||
+      !description
+    ) {
+      alert(
+        "Please fill in all fields."
+      );
       return;
     }
 
     try {
       setSubmitting(true);
 
-      const token = localStorage.getItem("token");
+      const token =
+        sessionStorage.getItem("token");
 
       // UPDATE EVENT
       if (editingId) {
@@ -169,7 +207,8 @@ function ManageEvents() {
           {
             method: "PUT",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type":
+                "application/json",
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
@@ -181,11 +220,13 @@ function ManageEvents() {
           }
         );
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         if (!response.ok) {
           setError(
-            data.message || "Failed to update event."
+            data.message ||
+              "Failed to update event."
           );
           return;
         }
@@ -198,19 +239,20 @@ function ManageEvents() {
           )
         );
 
-        alert("Event updated successfully.");
+        alert(
+          "Event updated successfully."
+        );
 
         resetForm();
-      }
-
-      // CREATE EVENT
-      else {
+      } else {
+        // CREATE EVENT
         const response = await fetch(
           "http://localhost:5000/api/events",
           {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type":
+                "application/json",
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
@@ -222,11 +264,13 @@ function ManageEvents() {
           }
         );
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         if (!response.ok) {
           setError(
-            data.message || "Failed to create event."
+            data.message ||
+              "Failed to create event."
           );
           return;
         }
@@ -236,13 +280,21 @@ function ManageEvents() {
           data.event || data,
         ]);
 
-        alert("Event created successfully.");
+        alert(
+          "Event created successfully."
+        );
 
         resetForm();
       }
     } catch (error) {
-      console.error("Event save error:", error);
-      setError("Unable to connect to the server.");
+      console.error(
+        "Event save error:",
+        error
+      );
+
+      setError(
+        "Unable to connect to the server."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -251,10 +303,15 @@ function ManageEvents() {
   // Edit event
   const handleEdit = (event) => {
     setEditingId(event._id);
+
     setTitle(event.title);
-    setDate(event.date.split("T")[0]);
+    setDate(
+      event.date.split("T")[0]
+    );
     setTime(event.time);
-    setDescription(event.description);
+    setDescription(
+      event.description
+    );
 
     window.scrollTo({
       top: 0,
@@ -264,16 +321,18 @@ function ManageEvents() {
 
   // Delete event
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this event?"
-    );
+    const confirmDelete =
+      window.confirm(
+        "Are you sure you want to delete this event?"
+      );
 
     if (!confirmDelete) {
       return;
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token =
+        sessionStorage.getItem("token");
 
       const response = await fetch(
         `http://localhost:5000/api/events/${id}`,
@@ -285,33 +344,47 @@ function ManageEvents() {
         }
       );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
       if (!response.ok) {
         alert(
-          data.message || "Failed to delete event."
+          data.message ||
+            "Failed to delete event."
         );
         return;
       }
 
       setEvents((previous) =>
-        previous.filter((event) => event._id !== id)
+        previous.filter(
+          (event) => event._id !== id
+        )
       );
 
-      alert("Event deleted successfully.");
+      alert(
+        "Event deleted successfully."
+      );
 
       if (editingId === id) {
         resetForm();
       }
     } catch (error) {
-      console.error("Delete event error:", error);
-      alert("Unable to connect to the server.");
+      console.error(
+        "Delete event error:",
+        error
+      );
+
+      alert(
+        "Unable to connect to the server."
+      );
     }
   };
 
   // Format date
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString(
+    return new Date(
+      date
+    ).toLocaleDateString(
       "en-GB",
       {
         day: "2-digit",
@@ -327,25 +400,37 @@ function ManageEvents() {
       return "";
     }
 
-    // Backend may already contain values such as "10:00 AM"
     if (
-      time.toLowerCase().includes("am") ||
-      time.toLowerCase().includes("pm")
+      time
+        .toLowerCase()
+        .includes("am") ||
+      time
+        .toLowerCase()
+        .includes("pm")
     ) {
       return time;
     }
 
-    const [hours, minutes] = time.split(":");
+    const [hours, minutes] =
+      time.split(":");
 
     const date = new Date();
 
-    date.setHours(Number(hours));
-    date.setMinutes(Number(minutes));
+    date.setHours(
+      Number(hours)
+    );
 
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    });
+    date.setMinutes(
+      Number(minutes)
+    );
+
+    return date.toLocaleTimeString(
+      "en-US",
+      {
+        hour: "numeric",
+        minute: "2-digit",
+      }
+    );
   };
 
   return (
@@ -389,7 +474,11 @@ function ManageEvents() {
 
         </nav>
 
-        <Link to="/" className="admin-logout">
+        <Link
+          to="/"
+          className="admin-logout"
+          onClick={handleLogout}
+        >
           Logout
         </Link>
 
@@ -402,7 +491,9 @@ function ManageEvents() {
         <header className="admin-topbar">
 
           <div>
-            <h1>Manage Events</h1>
+            <h1>
+              Manage Events
+            </h1>
 
             <p>
               Create and manage college events.
@@ -416,8 +507,13 @@ function ManageEvents() {
             </div>
 
             <div>
-              <strong>{adminName}</strong>
-              <span>Administrator</span>
+              <strong>
+                {adminName}
+              </strong>
+
+              <span>
+                Administrator
+              </span>
             </div>
 
           </div>
@@ -465,7 +561,9 @@ function ManageEvents() {
                   placeholder="Enter event title"
                   value={title}
                   onChange={(e) =>
-                    setTitle(e.target.value)
+                    setTitle(
+                      e.target.value
+                    )
                   }
                 />
 
@@ -481,7 +579,9 @@ function ManageEvents() {
                   type="date"
                   value={date}
                   onChange={(e) =>
-                    setDate(e.target.value)
+                    setDate(
+                      e.target.value
+                    )
                   }
                 />
 
@@ -497,7 +597,9 @@ function ManageEvents() {
                   type="time"
                   value={time}
                   onChange={(e) =>
-                    setTime(e.target.value)
+                    setTime(
+                      e.target.value
+                    )
                   }
                 />
 
@@ -516,7 +618,9 @@ function ManageEvents() {
                 placeholder="Enter event description"
                 value={description}
                 onChange={(e) =>
-                  setDescription(e.target.value)
+                  setDescription(
+                    e.target.value
+                  )
                 }
               ></textarea>
 
@@ -614,11 +718,15 @@ function ManageEvents() {
                   </div>
 
                   <span>
-                    {formatDate(event.date)}
+                    {formatDate(
+                      event.date
+                    )}
                   </span>
 
                   <span>
-                    {formatTime(event.time)}
+                    {formatTime(
+                      event.time
+                    )}
                   </span>
 
                   <div className="event-actions">
@@ -635,7 +743,9 @@ function ManageEvents() {
                     <button
                       className="delete-btn"
                       onClick={() =>
-                        handleDelete(event._id)
+                        handleDelete(
+                          event._id
+                        )
                       }
                     >
                       Delete
@@ -648,11 +758,12 @@ function ManageEvents() {
               ))
             )}
 
-            {!loading && events.length === 0 && (
-              <div className="no-events-admin">
-                No events available.
-              </div>
-            )}
+            {!loading &&
+              events.length === 0 && (
+                <div className="no-events-admin">
+                  No events available.
+                </div>
+              )}
 
           </div>
 
@@ -675,7 +786,8 @@ function ManageEvents() {
               </h2>
 
               <p>
-                Students who have registered for college events.
+                Students who have registered for
+                college events.
               </p>
 
             </div>
@@ -699,14 +811,15 @@ function ManageEvents() {
             <div className="no-events-admin">
               {registrationError}
             </div>
-          ) : registeredStudents.length === 0 ? (
+          ) : registeredStudents.length ===
+            0 ? (
             <div className="no-events-admin">
-              No students have registered for any event yet.
+              No students have registered for any
+              event yet.
             </div>
           ) : (
             <div className="event-table">
 
-              {/* Table Header */}
               <div className="event-table-header">
 
                 <span>Event</span>
@@ -716,48 +829,48 @@ function ManageEvents() {
 
               </div>
 
-              {/* Registered Students */}
-              {registeredStudents.map((registration) => (
+              {registeredStudents.map(
+                (registration) => (
 
-                <div
-                  className="event-table-row"
-                  key={registration._id}
-                >
+                  <div
+                    className="event-table-row"
+                    key={registration._id}
+                  >
 
-                  {/* Event */}
-                  <div>
+                    <div>
 
-                    <strong>
-                      {registration.eventTitle ||
-                        "Unknown Event"}
-                    </strong>
+                      <strong>
+                        {registration.eventTitle ||
+                          "Unknown Event"}
+                      </strong>
+
+                    </div>
+
+                    <span>
+                      {registration.student
+                        ?.name ||
+                        "Unknown Student"}
+                    </span>
+
+                    <span>
+                      {registration.student
+                        ?.email ||
+                        "No email"}
+                    </span>
+
+                    <span>
+                      {registration.registeredAt
+                        ? new Date(
+                            registration.registeredAt
+                          ).toLocaleString(
+                            "en-IN"
+                          )
+                        : "-"}
+                    </span>
 
                   </div>
-
-                  {/* Student Name */}
-                  <span>
-                    {registration.student?.name ||
-                      "Unknown Student"}
-                  </span>
-
-                  {/* Email */}
-                  <span>
-                    {registration.student?.email ||
-                      "No email"}
-                  </span>
-
-                  {/* Registered At */}
-                  <span>
-                    {registration.registeredAt
-                      ? new Date(
-                          registration.registeredAt
-                        ).toLocaleString("en-IN")
-                      : "-"}
-                  </span>
-
-                </div>
-
-              ))}
+                )
+              )}
 
             </div>
           )}

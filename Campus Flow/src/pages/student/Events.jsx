@@ -9,11 +9,19 @@ function Events() {
   const [registeringId, setRegisteringId] = useState(null);
   const [error, setError] = useState("");
 
+  // Logout
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    window.location.replace("/");
+  };
+
   // Fetch all events and student's registrations
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         // Get all events
         const eventsResponse = await fetch(
@@ -72,14 +80,17 @@ function Events() {
   // Register for an event
   const handleRegister = async (eventId) => {
     // Prevent duplicate clicks
-    if (isRegistered(eventId) || registeringId === eventId) {
+    if (
+      isRegistered(eventId) ||
+      registeringId === eventId
+    ) {
       return;
     }
 
     try {
       setRegisteringId(eventId);
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       const response = await fetch(
         "http://localhost:5000/api/event-registrations",
@@ -208,6 +219,7 @@ function Events() {
         <Link
           to="/"
           className="logout"
+          onClick={handleLogout}
         >
           Logout
         </Link>

@@ -9,6 +9,14 @@ function Clubs() {
   const [joiningClubId, setJoiningClubId] = useState(null);
   const [error, setError] = useState("");
 
+  // Logout
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    window.location.replace("/");
+  };
+
   // Fetch clubs and student's club memberships
   useEffect(() => {
     const fetchClubsAndMemberships = async () => {
@@ -16,7 +24,7 @@ function Clubs() {
         setLoading(true);
         setError("");
 
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         if (!token) {
           setError("You are not logged in.");
@@ -99,7 +107,7 @@ function Clubs() {
       setJoiningClubId(clubId);
       setError("");
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       if (!token) {
         alert("Please login again.");
@@ -261,6 +269,7 @@ function Clubs() {
         <Link
           to="/"
           className="logout"
+          onClick={handleLogout}
         >
           Logout
         </Link>

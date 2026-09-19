@@ -16,13 +16,17 @@ function Login() {
 
     setError("");
 
-    if (!email || !password) {
+    if (!email.trim() || !password) {
       setError("Please enter email and password.");
       return;
     }
 
     try {
       setLoading(true);
+
+      // Clear previous session in THIS TAB only
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
 
       const response = await fetch(
         "http://localhost:5000/api/auth/login",
@@ -32,8 +36,9 @@ function Login() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email,
+            email: email.trim().toLowerCase(),
             password,
+            role,
           }),
         }
       );
@@ -45,32 +50,52 @@ function Login() {
         return;
       }
 
-      // Save authentication information
-      localStorage.setItem("token", data.token);
+      // Validate backend response
+      if (
+        !data.token ||
+        !data.user ||
+        !data.user.id ||
+        !data.user.role
+      ) {
+        setError("Invalid login response from server.");
+        return;
+      }
 
-      localStorage.setItem(
+      // Save login session for THIS TAB only
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem(
         "user",
         JSON.stringify(data.user)
       );
+
+      console.log("Logged in user:", data.user);
 
       // Redirect according to backend role
       if (data.user.role === "student") {
         navigate("/student/studentdashboard", {
           replace: true,
         });
-      } else if (data.user.role === "admin") {
+
+        return;
+      }
+
+      if (data.user.role === "admin") {
         navigate("/admin/admindashboard", {
           replace: true,
         });
-      } else {
-        setError("Invalid user role.");
+
+        return;
       }
+
+      // Unknown role
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
+
+      setError("Invalid user role received from server.");
     } catch (error) {
       console.error("Login error:", error);
 
-      setError(
-        "Unable to connect to the server."
-      );
+      setError("Unable to connect to the server.");
     } finally {
       setLoading(false);
     }

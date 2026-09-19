@@ -7,11 +7,19 @@ function Announcements() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Logout
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    window.location.replace("/");
+  };
+
   // Fetch announcements from backend
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         const response = await fetch(
           "http://localhost:5000/api/announcements",
@@ -95,7 +103,11 @@ function Announcements() {
 
         </nav>
 
-        <Link to="/" className="logout">
+        <Link
+          to="/"
+          className="logout"
+          onClick={handleLogout}
+        >
           Logout
         </Link>
 

@@ -5,56 +5,80 @@ import "../../styles/manage-complaints.css";
 
 function ManageComplaints() {
   const [complaints, setComplaints] = useState([]);
-  const [selectedComplaint, setSelectedComplaint] =
-    useState(null);
-
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState(null);
   const [error, setError] = useState("");
 
-  // Fetch all complaints from backend
-  const fetchComplaints = async () => {
-    try {
-      const token = localStorage.getItem("token");
+  const user = JSON.parse(
+    sessionStorage.getItem("user") || "null"
+  );
 
-      const response = await fetch(
-        "http://localhost:5000/api/complaints",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  const adminName = user?.name || "Admin";
+  const avatarLetter = adminName.charAt(0).toUpperCase();
 
-      const data = await response.json();
+  // LOGOUT
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 
-      if (!response.ok) {
-        setError(
-          data.message || "Failed to load complaints."
-        );
-        return;
-      }
-
-      setComplaints(data);
-    } catch (error) {
-      console.error("Error fetching complaints:", error);
-      setError("Unable to connect to the server.");
-    } finally {
-      setLoading(false);
-    }
+    window.location.replace("/");
   };
 
-  // Load complaints when page opens
+  // FETCH ALL COMPLAINTS
   useEffect(() => {
+    const fetchComplaints = async () => {
+      try {
+        const token = sessionStorage.getItem("token");
+
+        const response = await fetch(
+          "http://localhost:5000/api/complaints",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(
+            data.message || "Failed to load complaints."
+          );
+          return;
+        }
+
+        setComplaints(data);
+      } catch (error) {
+        console.error(
+          "Error fetching complaints:",
+          error
+        );
+
+        setError(
+          "Unable to connect to the server."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchComplaints();
   }, []);
 
-  // Update complaint status
-  const handleStatusChange = async (id, newStatus) => {
+  // UPDATE COMPLAINT STATUS
+  const handleStatusChange = async (
+    complaintId,
+    status
+  ) => {
     try {
-      const token = localStorage.getItem("token");
+      setUpdatingId(complaintId);
+      setError("");
+
+      const token = sessionStorage.getItem("token");
 
       const response = await fetch(
-        `http://localhost:5000/api/complaints/${id}/status`,
+        `http://localhost:5000/api/complaints/${complaintId}/status`,
         {
           method: "PUT",
           headers: {
@@ -62,7 +86,7 @@ function ManageComplaints() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            status: newStatus,
+            status,
           }),
         }
       );
@@ -70,79 +94,79 @@ function ManageComplaints() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(
+        setError(
           data.message ||
             "Failed to update complaint status."
         );
         return;
       }
 
-      alert("Complaint status updated successfully.");
-
-      // Update complaint in list
       setComplaints((previous) =>
         previous.map((complaint) =>
-          complaint._id === id
-            ? {
-                ...complaint,
-                status: data.complaint.status,
-              }
+          complaint._id === complaintId
+            ? data.complaint || data
             : complaint
         )
       );
-
-      // Update selected complaint if it is open
-      if (selectedComplaint?._id === id) {
-        setSelectedComplaint((previous) => ({
-          ...previous,
-          status: data.complaint.status,
-        }));
-      }
     } catch (error) {
       console.error(
         "Complaint status update error:",
         error
       );
 
-      alert("Unable to connect to the server.");
+      setError(
+        "Unable to connect to the server."
+      );
+    } finally {
+      setUpdatingId(null);
     }
   };
 
-  // Format date
+  // FORMAT DATE
   const formatDate = (date) => {
     if (!date) {
-      return "";
+      return "-";
     }
 
-    return new Date(date).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    return new Date(date).toLocaleDateString(
+      "en-GB",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
   };
 
+  // STATUS COUNTS
   const pendingCount = complaints.filter(
-    (complaint) => complaint.status === "Pending"
+    (complaint) =>
+      complaint.status === "Pending"
   ).length;
 
-  const progressCount = complaints.filter(
-    (complaint) => complaint.status === "In Progress"
+  const inProgressCount = complaints.filter(
+    (complaint) =>
+      complaint.status === "In Progress"
   ).length;
 
   const resolvedCount = complaints.filter(
-    (complaint) => complaint.status === "Resolved"
-  ).length;
-
-  const rejectedCount = complaints.filter(
-    (complaint) => complaint.status === "Rejected"
+    (complaint) =>
+      complaint.status === "Resolved"
   ).length;
 
   return (
     <div className="admin-dashboard">
-      <aside className="admin-sidebar">
-        <div className="admin-logo">Campus Flow</div>
 
-        <div className="admin-label">ADMIN PANEL</div>
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+
+        <div className="admin-logo">
+          Campus Flow
+        </div>
+
+        <div className="admin-label">
+          ADMIN PANEL
+        </div>
 
         <nav>
           <Link to="/admin/admindashboard">
@@ -169,15 +193,26 @@ function ManageComplaints() {
           </Link>
         </nav>
 
-        <Link to="/" className="admin-logout">
+        <Link
+          to="/"
+          className="admin-logout"
+          onClick={handleLogout}
+        >
           Logout
         </Link>
+
       </aside>
 
+      {/* Main Content */}
       <main className="admin-main">
+
+        {/* Topbar */}
         <header className="admin-topbar">
+
           <div>
-            <h1>Manage Complaints</h1>
+            <h1>
+              Manage Complaints
+            </h1>
 
             <p>
               Review and manage student complaints.
@@ -185,254 +220,230 @@ function ManageComplaints() {
           </div>
 
           <div className="admin-profile">
-            <div className="admin-avatar">A</div>
+
+            <div className="admin-avatar">
+              {avatarLetter}
+            </div>
 
             <div>
-              <strong>Admin</strong>
-              <span>Administrator</span>
+              <strong>
+                {adminName}
+              </strong>
+
+              <span>
+                Administrator
+              </span>
             </div>
+
           </div>
+
         </header>
 
-        {/* COMPLAINT STATISTICS */}
-        <section className="complaint-stats">
-          <div className="complaint-stat-card">
-            <span>Pending</span>
-            <h2>{pendingCount}</h2>
+        {/* Error */}
+        {error && (
+          <p style={{ color: "red" }}>
+            {error}
+          </p>
+        )}
+
+        {/* COMPLAINT STATS */}
+        <section className="admin-stats">
+
+          {/* TOTAL COMPLAINTS */}
+          <div className="stat-card">
+            <h3>
+              Total Complaints
+            </h3>
+
+            <p>
+              {complaints.length}
+            </p>
           </div>
 
-          <div className="complaint-stat-card">
-            <span>In Progress</span>
-            <h2>{progressCount}</h2>
+          {/* PENDING */}
+          <div className="stat-card">
+            <h3>
+              Pending
+            </h3>
+
+            <p>
+              {pendingCount}
+            </p>
           </div>
 
-          <div className="complaint-stat-card">
-            <span>Resolved</span>
-            <h2>{resolvedCount}</h2>
+          {/* IN PROGRESS */}
+          <div className="stat-card">
+            <h3>
+              In Progress
+            </h3>
+
+            <p>
+              {inProgressCount}
+            </p>
           </div>
 
-          <div className="complaint-stat-card">
-            <span>Rejected</span>
-            <h2>{rejectedCount}</h2>
+          {/* RESOLVED */}
+          <div className="stat-card">
+            <h3>
+              Resolved
+            </h3>
+
+            <p>
+              {resolvedCount}
+            </p>
           </div>
+
         </section>
 
-        {/* COMPLAINT LIST */}
+        {/* COMPLAINTS */}
         <section className="complaints-management">
+
           <div className="management-header">
+
             <div>
-              <h2>Student Complaints</h2>
+              <h2>
+                Student Complaints
+              </h2>
 
               <p>
-                Review complaints submitted by students.
+                View complaints and update their status.
               </p>
             </div>
 
             <span>
-              {complaints.length}{" "}
-              {complaints.length === 1
-                ? "Complaint"
-                : "Complaints"}
+              {loading
+                ? "Loading..."
+                : `${complaints.length} ${
+                    complaints.length === 1
+                      ? "Complaint"
+                      : "Complaints"
+                  }`}
             </span>
+
           </div>
 
-          {loading && (
-            <p>Loading complaints...</p>
-          )}
+          <div className="complaint-table">
 
-          {error && (
-            <p style={{ color: "red" }}>
-              {error}
-            </p>
-          )}
+            <div className="complaint-table-header">
 
-          {!loading && !error && (
-            <div className="complaint-table">
-              <div className="complaint-table-header">
-                <span>Complaint</span>
-                <span>Student</span>
-                <span>Category</span>
-                <span>Status</span>
-                <span>Action</span>
+              <span>
+                Student
+              </span>
+
+              <span>
+                Complaint
+              </span>
+
+              <span>
+                Category
+              </span>
+
+              <span>
+                Date
+              </span>
+
+              <span>
+                Status
+              </span>
+
+            </div>
+
+            {loading ? (
+
+              <div className="no-complaints-admin">
+                Loading complaints...
               </div>
 
-              {complaints.map((complaint) => (
-                <div
-                  className="complaint-table-row"
-                  key={complaint._id}
-                >
-                  <div>
-                    <strong>
-                      {complaint.title}
-                    </strong>
+            ) : complaints.length === 0 ? (
 
-                    <small>
+              <div className="no-complaints-admin">
+                No complaints available.
+              </div>
+
+            ) : (
+
+              complaints.map(
+                (complaint) => (
+
+                  <div
+                    className="complaint-table-row"
+                    key={complaint._id}
+                  >
+
+                    <div>
+                      <strong>
+                        {complaint.student?.name ||
+                          "Unknown Student"}
+                      </strong>
+
+                      <small>
+                        {complaint.student?.email ||
+                          "No email"}
+                      </small>
+                    </div>
+
+                    <div>
+                      <strong>
+                        {complaint.title}
+                      </strong>
+
+                      <small>
+                        {complaint.description}
+                      </small>
+                    </div>
+
+                    <span>
+                      {complaint.category}
+                    </span>
+
+                    <span>
                       {formatDate(
                         complaint.createdAt
                       )}
-                    </small>
+                    </span>
+
+                    <select
+                      value={complaint.status}
+                      disabled={
+                        updatingId ===
+                        complaint._id
+                      }
+                      onChange={(e) =>
+                        handleStatusChange(
+                          complaint._id,
+                          e.target.value
+                        )
+                      }
+                    >
+                      <option value="Pending">
+                        Pending
+                      </option>
+
+                      <option value="In Progress">
+                        In Progress
+                      </option>
+
+                      <option value="Resolved">
+                        Resolved
+                      </option>
+
+                      <option value="Rejected">
+                        Rejected
+                      </option>
+                    </select>
+
                   </div>
+                )
+              )
 
-                  <span>
-                    {complaint.student?.name ||
-                      "Unknown Student"}
-                  </span>
+            )}
 
-                  <span className="category-tag">
-                    {complaint.category}
-                  </span>
+          </div>
 
-                  <select
-                    className={`status-select ${complaint.status
-                      .toLowerCase()
-                      .replace(" ", "-")}`}
-                    value={complaint.status}
-                    onChange={(e) =>
-                      handleStatusChange(
-                        complaint._id,
-                        e.target.value
-                      )
-                    }
-                  >
-                    <option value="Pending">
-                      Pending
-                    </option>
-
-                    <option value="In Progress">
-                      In Progress
-                    </option>
-
-                    <option value="Resolved">
-                      Resolved
-                    </option>
-
-                    <option value="Rejected">
-                      Rejected
-                    </option>
-                  </select>
-
-                  <button
-                    className="view-btn"
-                    onClick={() =>
-                      setSelectedComplaint(
-                        complaint
-                      )
-                    }
-                  >
-                    View
-                  </button>
-                </div>
-              ))}
-
-              {complaints.length === 0 && (
-                <div className="no-complaints-admin">
-                  No complaints available.
-                </div>
-              )}
-            </div>
-          )}
         </section>
 
-        {/* COMPLAINT DETAILS */}
-        {selectedComplaint && (
-          <section className="complaint-details">
-            <div className="details-header">
-              <div>
-                <h2>Complaint Details</h2>
-
-                <p>
-                  Review the complete complaint
-                  information.
-                </p>
-              </div>
-
-              <button
-                className="close-details-btn"
-                onClick={() =>
-                  setSelectedComplaint(null)
-                }
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="details-content">
-              <div className="detail-item">
-                <span>Title</span>
-
-                <strong>
-                  {selectedComplaint.title}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span>Student</span>
-
-                <strong>
-                  {selectedComplaint.student?.name ||
-                    "Unknown Student"}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span>Category</span>
-
-                <strong>
-                  {selectedComplaint.category}
-                </strong>
-              </div>
-
-              <div className="detail-item">
-                <span>Date</span>
-
-                <strong>
-                  {formatDate(
-                    selectedComplaint.createdAt
-                  )}
-                </strong>
-              </div>
-
-              <div className="detail-item full-width">
-                <span>Description</span>
-
-                <p>
-                  {selectedComplaint.description}
-                </p>
-              </div>
-
-              <div className="detail-item">
-                <span>Status</span>
-
-                <select
-                  value={selectedComplaint.status}
-                  onChange={(e) =>
-                    handleStatusChange(
-                      selectedComplaint._id,
-                      e.target.value
-                    )
-                  }
-                >
-                  <option value="Pending">
-                    Pending
-                  </option>
-
-                  <option value="In Progress">
-                    In Progress
-                  </option>
-
-                  <option value="Resolved">
-                    Resolved
-                  </option>
-
-                  <option value="Rejected">
-                    Rejected
-                  </option>
-                </select>
-              </div>
-            </div>
-          </section>
-        )}
       </main>
+
     </div>
   );
 }

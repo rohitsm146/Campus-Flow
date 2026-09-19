@@ -11,7 +11,9 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(
+    sessionStorage.getItem("user")
+  );
 
   const adminName = user?.name || "Admin";
   const avatarLetter = adminName.charAt(0).toUpperCase();
@@ -19,7 +21,7 @@ function AdminDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         const headers = {
           Authorization: `Bearer ${token}`,
@@ -113,11 +115,11 @@ function AdminDashboard() {
   }, []);
 
   const handleLogout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 
-  window.location.replace("/");
-};
+    window.location.replace("/");
+  };
 
   const recentComplaints = [...complaints]
     .sort(

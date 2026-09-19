@@ -12,11 +12,19 @@ function Complaints() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // Logout
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    window.location.replace("/");
+  };
+
   // Fetch student's complaints
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
 
         const response = await fetch(
           "http://localhost:5000/api/complaints/my",
@@ -30,14 +38,23 @@ function Complaints() {
         const data = await response.json();
 
         if (!response.ok) {
-          setError(data.message || "Failed to load complaints.");
+          setError(
+            data.message ||
+              "Failed to load complaints."
+          );
           return;
         }
 
         setComplaints(data);
       } catch (error) {
-        console.error("Error fetching complaints:", error);
-        setError("Unable to connect to the server.");
+        console.error(
+          "Error fetching complaints:",
+          error
+        );
+
+        setError(
+          "Unable to connect to the server."
+        );
       } finally {
         setLoading(false);
       }
@@ -52,15 +69,20 @@ function Complaints() {
 
     setError("");
 
-    if (!title.trim() || !description.trim()) {
-      setError("Please enter both complaint title and description.");
+    if (
+      !title.trim() ||
+      !description.trim()
+    ) {
+      setError(
+        "Please enter both complaint title and description."
+      );
       return;
     }
 
     try {
       setSubmitting(true);
 
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       const response = await fetch(
         "http://localhost:5000/api/complaints",
@@ -81,7 +103,10 @@ function Complaints() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Failed to submit complaint.");
+        setError(
+          data.message ||
+            "Failed to submit complaint."
+        );
         return;
       }
 
@@ -94,10 +119,18 @@ function Complaints() {
       setDescription("");
       setCategory("Academic");
 
-      alert("Complaint submitted successfully.");
+      alert(
+        "Complaint submitted successfully."
+      );
     } catch (error) {
-      console.error("Complaint submission error:", error);
-      setError("Unable to connect to the server.");
+      console.error(
+        "Complaint submission error:",
+        error
+      );
+
+      setError(
+        "Unable to connect to the server."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -105,11 +138,14 @@ function Complaints() {
 
   // Format date
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    return new Date(date).toLocaleDateString(
+      "en-GB",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
   };
 
   return (
@@ -117,11 +153,13 @@ function Complaints() {
 
       {/* Sidebar */}
       <aside className="sidebar">
+
         <div className="logo">
           Campus Flow
         </div>
 
         <nav>
+
           <Link to="/student/studentdashboard">
             Dashboard
           </Link>
@@ -144,11 +182,17 @@ function Complaints() {
           >
             Complaints
           </Link>
+
         </nav>
 
-        <Link to="/" className="logout">
+        <Link
+          to="/"
+          className="logout"
+          onClick={handleLogout}
+        >
           Logout
         </Link>
+
       </aside>
 
       {/* Main Content */}
@@ -156,12 +200,15 @@ function Complaints() {
 
         {/* Top Bar */}
         <header className="topbar">
+
           <div>
             <h1>Complaints</h1>
+
             <p>
               Submit and track your campus complaints.
             </p>
           </div>
+
         </header>
 
         {/* Submit Complaint Box */}
@@ -176,14 +223,21 @@ function Complaints() {
               background: "#ffffff",
               padding: "25px",
               borderRadius: "12px",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.08)",
+              boxShadow:
+                "0 2px 10px rgba(0, 0, 0, 0.08)",
               border: "1px solid #e5e7eb",
             }}
           >
+
             <form onSubmit={handleSubmit}>
 
               {/* Title */}
-              <div style={{ marginBottom: "18px" }}>
+              <div
+                style={{
+                  marginBottom: "18px",
+                }}
+              >
+
                 <label
                   style={{
                     display: "block",
@@ -204,16 +258,23 @@ function Complaints() {
                   style={{
                     width: "100%",
                     padding: "12px",
-                    border: "1px solid #d1d5db",
+                    border:
+                      "1px solid #d1d5db",
                     borderRadius: "8px",
                     fontSize: "14px",
                     boxSizing: "border-box",
                   }}
                 />
+
               </div>
 
               {/* Category */}
-              <div style={{ marginBottom: "18px" }}>
+              <div
+                style={{
+                  marginBottom: "18px",
+                }}
+              >
+
                 <label
                   style={{
                     display: "block",
@@ -227,44 +288,61 @@ function Complaints() {
                 <select
                   value={category}
                   onChange={(e) =>
-                    setCategory(e.target.value)
+                    setCategory(
+                      e.target.value
+                    )
                   }
                   style={{
                     width: "100%",
                     padding: "12px",
-                    border: "1px solid #d1d5db",
+                    border:
+                      "1px solid #d1d5db",
                     borderRadius: "8px",
                     fontSize: "14px",
                     boxSizing: "border-box",
                     background: "#ffffff",
                   }}
                 >
+
                   <option value="Academic">
                     Academic
                   </option>
+
                   <option value="Infrastructure">
                     Infrastructure
                   </option>
+
                   <option value="Hostel">
                     Hostel
                   </option>
+
                   <option value="Library">
                     Library
                   </option>
+
                   <option value="Transport">
                     Transport
                   </option>
+
                   <option value="Canteen">
                     Canteen
                   </option>
+
                   <option value="Other">
                     Other
                   </option>
+
                 </select>
+
               </div>
 
               {/* Description */}
-              <div style={{ marginBottom: "18px" }}>
+              <div
+                style={{
+                  marginBottom: "18px",
+                }}
+              >
+
                 <label
                   style={{
                     display: "block",
@@ -279,19 +357,23 @@ function Complaints() {
                   placeholder="Describe your complaint"
                   value={description}
                   onChange={(e) =>
-                    setDescription(e.target.value)
+                    setDescription(
+                      e.target.value
+                    )
                   }
                   rows="5"
                   style={{
                     width: "100%",
                     padding: "12px",
-                    border: "1px solid #d1d5db",
+                    border:
+                      "1px solid #d1d5db",
                     borderRadius: "8px",
                     fontSize: "14px",
                     boxSizing: "border-box",
                     resize: "vertical",
                   }}
                 />
+
               </div>
 
               {/* Error */}
@@ -326,7 +408,9 @@ function Complaints() {
               </button>
 
             </form>
+
           </div>
+
         </section>
 
         {/* Complaint History */}
@@ -337,66 +421,85 @@ function Complaints() {
           </div>
 
           {loading ? (
-            <p>Loading complaints...</p>
+
+            <p>
+              Loading complaints...
+            </p>
+
           ) : complaints.length === 0 ? (
+
             <div
               style={{
                 background: "#ffffff",
                 padding: "25px",
                 borderRadius: "12px",
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.08)",
-                border: "1px solid #e5e7eb",
+                boxShadow:
+                  "0 2px 10px rgba(0, 0, 0, 0.08)",
+                border:
+                  "1px solid #e5e7eb",
               }}
             >
-              <p>No complaints submitted yet.</p>
+              <p>
+                No complaints submitted yet.
+              </p>
             </div>
+
           ) : (
+
             <div className="cards">
 
-              {complaints.map((complaint) => (
-                <div
-                  className="event-card"
-                  key={complaint._id}
-                >
+              {complaints.map(
+                (complaint) => (
 
-                  <h3>
-                    {complaint.title}
-                  </h3>
+                  <div
+                    className="event-card"
+                    key={complaint._id}
+                  >
 
-                  <p>
-                    {complaint.description}
-                  </p>
+                    <h3>
+                      {complaint.title}
+                    </h3>
 
-                  <div className="event-info">
+                    <p>
+                      {complaint.description}
+                    </p>
 
-                    <span>
-                      📂 Category:{" "}
-                      {complaint.category}
-                    </span>
+                    <div className="event-info">
 
-                    <span>
-                      📅{" "}
-                      {formatDate(
-                        complaint.createdAt
-                      )}
-                    </span>
+                      <span>
+                        📂 Category:{" "}
+                        {complaint.category}
+                      </span>
+
+                      <span>
+                        📅{" "}
+                        {formatDate(
+                          complaint.createdAt
+                        )}
+                      </span>
+
+                    </div>
+
+                    <p>
+                      <strong>
+                        Status:
+                      </strong>{" "}
+                      {complaint.status}
+                    </p>
 
                   </div>
 
-                  <p>
-                    <strong>Status:</strong>{" "}
-                    {complaint.status}
-                  </p>
-
-                </div>
-              ))}
+                )
+              )}
 
             </div>
+
           )}
 
         </section>
 
       </main>
+
     </div>
   );
 }

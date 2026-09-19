@@ -5,7 +5,8 @@ import "../../styles/manage-clubs.css";
 
 function ManageClubs() {
   const [clubs, setClubs] = useState([]);
-  const [membershipRequests, setMembershipRequests] = useState([]);
+  const [membershipRequests, setMembershipRequests] =
+    useState([]);
 
   const [name, setName] = useState("");
   const [faculty, setFaculty] = useState("");
@@ -13,16 +14,16 @@ function ManageClubs() {
   const [description, setDescription] = useState("");
 
   const [editingId, setEditingId] = useState(null);
-
   const [loading, setLoading] = useState(true);
-  const [requestsLoading, setRequestsLoading] = useState(true);
+  const [requestsLoading, setRequestsLoading] =
+    useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [requestActionId, setRequestActionId] = useState(null);
-
+  const [requestActionId, setRequestActionId] =
+    useState(null);
   const [error, setError] = useState("");
 
   const user = JSON.parse(
-    localStorage.getItem("user")
+    sessionStorage.getItem("user") || "null"
   );
 
   const adminName = user?.name || "Admin";
@@ -30,14 +31,20 @@ function ManageClubs() {
     .charAt(0)
     .toUpperCase();
 
-  // ==============================
+  // LOGOUT
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    window.location.replace("/");
+  };
+
   // FETCH CLUBS
-  // ==============================
   useEffect(() => {
     const fetchClubs = async () => {
       try {
         const token =
-          localStorage.getItem("token");
+          sessionStorage.getItem("token");
 
         const response = await fetch(
           "http://localhost:5000/api/clubs",
@@ -76,15 +83,13 @@ function ManageClubs() {
     fetchClubs();
   }, []);
 
-  // ==============================
-  // FETCH MEMBERSHIP REQUESTS
-  // ==============================
+  // FETCH CLUB MEMBERSHIP REQUESTS
   useEffect(() => {
     const fetchMembershipRequests =
       async () => {
         try {
           const token =
-            localStorage.getItem("token");
+            sessionStorage.getItem("token");
 
           const response = await fetch(
             "http://localhost:5000/api/club-memberships",
@@ -124,9 +129,7 @@ function ManageClubs() {
     fetchMembershipRequests();
   }, []);
 
-  // ==============================
   // CLEAR FORM
-  // ==============================
   const clearForm = () => {
     setName("");
     setFaculty("");
@@ -135,9 +138,7 @@ function ManageClubs() {
     setEditingId(null);
   };
 
-  // ==============================
   // ADD / UPDATE CLUB
-  // ==============================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -149,7 +150,9 @@ function ManageClubs() {
       !student ||
       !description
     ) {
-      alert("Please fill in all fields.");
+      alert(
+        "Please fill in all fields."
+      );
       return;
     }
 
@@ -157,10 +160,10 @@ function ManageClubs() {
       setSubmitting(true);
 
       const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
-      // UPDATE
       if (editingId) {
+        // UPDATE CLUB
         const response = await fetch(
           `http://localhost:5000/api/clubs/${editingId}`,
           {
@@ -203,10 +206,8 @@ function ManageClubs() {
         );
 
         clearForm();
-      }
-
-      // CREATE
-      else {
+      } else {
+        // CREATE CLUB
         const response = await fetch(
           "http://localhost:5000/api/clubs",
           {
@@ -261,9 +262,7 @@ function ManageClubs() {
     }
   };
 
-  // ==============================
   // EDIT CLUB
-  // ==============================
   const handleEdit = (club) => {
     setEditingId(club._id);
 
@@ -274,7 +273,9 @@ function ManageClubs() {
     setStudent(
       club.studentCoordinator
     );
-    setDescription(club.description);
+    setDescription(
+      club.description
+    );
 
     window.scrollTo({
       top: 0,
@@ -282,9 +283,7 @@ function ManageClubs() {
     });
   };
 
-  // ==============================
   // DELETE CLUB
-  // ==============================
   const handleDelete = async (id) => {
     const confirmDelete =
       window.confirm(
@@ -297,7 +296,7 @@ function ManageClubs() {
 
     try {
       const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
       const response = await fetch(
         `http://localhost:5000/api/clubs/${id}`,
@@ -345,109 +344,98 @@ function ManageClubs() {
     }
   };
 
-  // ==============================
-  // APPROVE / REJECT
-  // ==============================
-  const handleMembershipAction = async (
-    membershipId,
-    action
-  ) => {
-    const actionText =
-      action === "approve"
-        ? "approve"
-        : "reject";
+  // APPROVE / REJECT MEMBERSHIP
+  const handleMembershipAction =
+    async (membershipId, action) => {
+      const actionText =
+        action === "approve"
+          ? "approve"
+          : "reject";
 
-    const confirmAction =
-      window.confirm(
-        `Are you sure you want to ${actionText} this club join request?`
-      );
-
-    if (!confirmAction) {
-      return;
-    }
-
-    try {
-      setRequestActionId(
-        membershipId
-      );
-
-      const token =
-        localStorage.getItem("token");
-
-      const response = await fetch(
-        `http://localhost:5000/api/club-memberships/${membershipId}/${action}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        alert(
-          data.message ||
-            `Failed to ${actionText} request.`
+      const confirmAction =
+        window.confirm(
+          `Are you sure you want to ${actionText} this club join request?`
         );
+
+      if (!confirmAction) {
         return;
       }
 
-      const updatedMembership =
-        data.membership || data;
+      try {
+        setRequestActionId(
+          membershipId
+        );
 
-      setMembershipRequests(
-        (previous) =>
-          previous.map((request) =>
-            request._id === membershipId
-              ? updatedMembership
-              : request
-          )
-      );
+        const token =
+          sessionStorage.getItem("token");
 
-      alert(
-        action === "approve"
-          ? "Club membership approved successfully."
-          : "Club membership rejected successfully."
-      );
-    } catch (error) {
-      console.error(
-        "Membership action error:",
-        error
-      );
+        const response = await fetch(
+          `http://localhost:5000/api/club-memberships/${membershipId}/${action}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      alert(
-        "Unable to connect to the server."
-      );
-    } finally {
-      setRequestActionId(null);
-    }
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          alert(
+            data.message ||
+              `Failed to ${actionText} request.`
+          );
+          return;
+        }
+
+        setMembershipRequests(
+          (previous) =>
+            previous.map(
+              (request) =>
+                request._id ===
+                membershipId
+                  ? data.membership ||
+                    request
+                  : request
+            )
+        );
+
+        alert(
+          action === "approve"
+            ? "Club membership approved successfully."
+            : "Club membership rejected successfully."
+        );
+      } catch (error) {
+        console.error(
+          "Membership action error:",
+          error
+        );
+
+        alert(
+          "Unable to connect to the server."
+        );
+      } finally {
+        setRequestActionId(null);
+      }
+    };
+
+  // CANCEL EDIT
+  const cancelEdit = () => {
+    clearForm();
   };
 
-  // ==============================
-  // PENDING REQUESTS
-  // ==============================
   const pendingRequests =
     membershipRequests.filter(
       (request) =>
         request.status === "pending"
     );
 
-  // ==============================
-  // PROCESSED REQUESTS
-  // ==============================
-  const processedRequests =
-    membershipRequests.filter(
-      (request) =>
-        request.status !== "pending"
-    );
-
   return (
     <div className="admin-dashboard">
 
-      {/* SIDEBAR */}
+      {/* Sidebar */}
       <aside className="admin-sidebar">
 
         <div className="admin-logo">
@@ -488,19 +476,21 @@ function ManageClubs() {
         <Link
           to="/"
           className="admin-logout"
+          onClick={handleLogout}
         >
           Logout
         </Link>
 
       </aside>
 
-      {/* MAIN */}
+      {/* Main Content */}
       <main className="admin-main">
 
-        {/* TOPBAR */}
+        {/* Topbar */}
         <header className="admin-topbar">
 
           <div>
+
             <h1>
               Manage Clubs
             </h1>
@@ -508,6 +498,7 @@ function ManageClubs() {
             <p>
               Create and manage college clubs.
             </p>
+
           </div>
 
           <div className="admin-profile">
@@ -517,6 +508,7 @@ function ManageClubs() {
             </div>
 
             <div>
+
               <strong>
                 {adminName}
               </strong>
@@ -524,13 +516,14 @@ function ManageClubs() {
               <span>
                 Administrator
               </span>
+
             </div>
 
           </div>
 
         </header>
 
-        {/* ERROR */}
+        {/* Error */}
         {error && (
           <p style={{ color: "red" }}>
             {error}
@@ -571,7 +564,9 @@ function ManageClubs() {
                   placeholder="Enter club name"
                   value={name}
                   onChange={(e) =>
-                    setName(e.target.value)
+                    setName(
+                      e.target.value
+                    )
                   }
                 />
 
@@ -632,7 +627,7 @@ function ManageClubs() {
                     e.target.value
                   )
                 }
-              />
+              ></textarea>
 
             </div>
 
@@ -652,7 +647,7 @@ function ManageClubs() {
               <button
                 type="button"
                 className="cancel-edit-btn"
-                onClick={clearForm}
+                onClick={cancelEdit}
                 disabled={submitting}
               >
                 Cancel
@@ -696,7 +691,9 @@ function ManageClubs() {
 
             <div className="club-table-header">
 
-              <span>Club</span>
+              <span>
+                Club
+              </span>
 
               <span>
                 Faculty Coordinator
@@ -774,6 +771,7 @@ function ManageClubs() {
                 </div>
 
               ))
+
             )}
 
             {!loading &&
@@ -814,8 +812,7 @@ function ManageClubs() {
               {requestsLoading
                 ? "Loading..."
                 : `${pendingRequests.length} ${
-                    pendingRequests.length ===
-                    1
+                    pendingRequests.length === 1
                       ? "Pending Request"
                       : "Pending Requests"
                   }`}
@@ -832,6 +829,7 @@ function ManageClubs() {
                   "1.5fr 1.5fr 1.5fr 1fr",
               }}
             >
+
               <span>
                 Student
               </span>
@@ -856,8 +854,7 @@ function ManageClubs() {
                 Loading requests...
               </div>
 
-            ) : pendingRequests.length ===
-              0 ? (
+            ) : pendingRequests.length === 0 ? (
 
               <div className="no-clubs-admin">
                 No pending club requests.
@@ -866,106 +863,109 @@ function ManageClubs() {
             ) : (
 
               pendingRequests.map(
-                (request) => {
+                (request) => (
 
-                  const processing =
-                    requestActionId ===
-                    request._id;
+                  <div
+                    className="club-table-row"
+                    key={request._id}
+                    style={{
+                      gridTemplateColumns:
+                        "1.5fr 1.5fr 1.5fr 1fr",
+                    }}
+                  >
 
-                  return (
+                    <div>
+
+                      <strong>
+                        {request.student
+                          ?.name ||
+                          "Unknown Student"}
+                      </strong>
+
+                      <small>
+                        Status:{" "}
+                        {request.status}
+                      </small>
+
+                    </div>
+
+                    <span>
+                      {request.student
+                        ?.email ||
+                        "N/A"}
+                    </span>
+
+                    <span>
+                      {request.club
+                        ?.clubName ||
+                        "Club no longer available"}
+                    </span>
+
                     <div
-                      className="club-table-row"
-                      key={request._id}
+                      className="club-actions"
                       style={{
-                        gridTemplateColumns:
-                          "1.5fr 1.5fr 1.5fr 1fr",
+                        display: "flex",
+                        gap: "8px",
+                        flexWrap: "wrap",
                       }}
                     >
 
-                      <div>
-
-                        <strong>
-                          {request.student
-                            ?.name ||
-                            "Unknown Student"}
-                        </strong>
-
-                        <small>
-                          Status:{" "}
-                          {request.status}
-                        </small>
-
-                      </div>
-
-                      <span>
-                        {request.student
-                          ?.email ||
-                          "N/A"}
-                      </span>
-
-                      <span>
-                        {request.club
-                          ?.clubName ||
-                          "Club no longer available"}
-                      </span>
-
-                      <div
-                        className="club-actions"
-                        style={{
-                          display: "flex",
-                          gap: "8px",
-                          flexWrap: "wrap",
-                        }}
+                      <button
+                        className="edit-btn"
+                        disabled={
+                          requestActionId ===
+                          request._id
+                        }
+                        onClick={() =>
+                          handleMembershipAction(
+                            request._id,
+                            "approve"
+                          )
+                        }
                       >
+                        {requestActionId ===
+                        request._id
+                          ? "..."
+                          : "Accept"}
+                      </button>
 
-                        <button
-                          className="edit-btn"
-                          disabled={
-                            processing
-                          }
-                          onClick={() =>
-                            handleMembershipAction(
-                              request._id,
-                              "approve"
-                            )
-                          }
-                        >
-                          {processing
-                            ? "..."
-                            : "Accept"}
-                        </button>
-
-                        <button
-                          className="delete-btn"
-                          disabled={
-                            processing
-                          }
-                          onClick={() =>
-                            handleMembershipAction(
-                              request._id,
-                              "reject"
-                            )
-                          }
-                        >
-                          {processing
-                            ? "..."
-                            : "Reject"}
-                        </button>
-
-                      </div>
+                      <button
+                        className="delete-btn"
+                        disabled={
+                          requestActionId ===
+                          request._id
+                        }
+                        onClick={() =>
+                          handleMembershipAction(
+                            request._id,
+                            "reject"
+                          )
+                        }
+                      >
+                        {requestActionId ===
+                        request._id
+                          ? "..."
+                          : "Reject"}
+                      </button>
 
                     </div>
-                  );
-                }
+
+                  </div>
+
+                )
               )
+
             )}
 
           </div>
 
-          {/* REQUEST HISTORY */}
+          {/* ALL PROCESSED REQUESTS */}
           {!requestsLoading &&
-            processedRequests.length >
-              0 && (
+            membershipRequests.some(
+              (request) =>
+                request.status !==
+                "pending"
+            ) && (
 
               <div
                 style={{
@@ -1018,58 +1018,68 @@ function ManageClubs() {
 
                   </div>
 
-                  {processedRequests.map(
-                    (request) => (
+                  {membershipRequests
+                    .filter(
+                      (request) =>
+                        request.status !==
+                        "pending"
+                    )
+                    .map(
+                      (request) => (
 
-                      <div
-                        className="club-table-row"
-                        key={request._id}
-                        style={{
-                          gridTemplateColumns:
-                            "1.5fr 1.5fr 1.5fr 1fr",
-                        }}
-                      >
+                        <div
+                          className="club-table-row"
+                          key={request._id}
+                          style={{
+                            gridTemplateColumns:
+                              "1.5fr 1.5fr 1.5fr 1fr",
+                          }}
+                        >
 
-                        <div>
+                          <div>
 
-                          <strong>
-                            {request.student
-                              ?.name ||
-                              "Unknown Student"}
-                          </strong>
+                            <strong>
+                              {request
+                                .student
+                                ?.name ||
+                                "Unknown Student"}
+                            </strong>
+
+                          </div>
+
+                          <span>
+                            {request
+                              .student
+                              ?.email ||
+                              "N/A"}
+                          </span>
+
+                          <span>
+                            {request.club
+                              ?.clubName ||
+                              "Club no longer available"}
+                          </span>
+
+                          <span
+                            style={{
+                              textTransform:
+                                "capitalize",
+                              fontWeight:
+                                "600",
+                            }}
+                          >
+                            {request.status}
+                          </span>
 
                         </div>
 
-                        <span>
-                          {request.student
-                            ?.email ||
-                            "N/A"}
-                        </span>
-
-                        <span>
-                          {request.club
-                            ?.clubName ||
-                            "Club no longer available"}
-                        </span>
-
-                        <span
-                          style={{
-                            textTransform:
-                              "capitalize",
-                            fontWeight:
-                              "600",
-                          }}
-                        >
-                          {request.status}
-                        </span>
-
-                      </div>
-                    )
-                  )}
+                      )
+                    )}
 
                 </div>
 
               </div>
+
             )}
 
         </section>
