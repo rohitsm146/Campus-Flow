@@ -104,7 +104,15 @@ function ManageComplaints() {
       setComplaints((previous) =>
         previous.map((complaint) =>
           complaint._id === complaintId
-            ? data.complaint || data
+            ? {
+                ...complaint,
+                ...(data.complaint || data),
+
+                // Keep the already loaded student details
+                // because the status update response may
+                // not contain the populated student object.
+                student: complaint.student,
+              }
             : complaint
         )
       );
