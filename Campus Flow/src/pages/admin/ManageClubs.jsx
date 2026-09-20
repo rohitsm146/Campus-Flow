@@ -47,7 +47,7 @@ function ManageClubs() {
           sessionStorage.getItem("token");
 
         const response = await fetch(
-          "http://localhost:5000/api/clubs",
+          "https://campus-flow-backend-6ega.onrender.com/api/clubs",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -92,7 +92,7 @@ function ManageClubs() {
             sessionStorage.getItem("token");
 
           const response = await fetch(
-            "http://localhost:5000/api/club-memberships",
+            "https://campus-flow-backend-6ega.onrender.com/api/club-memberships",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -165,7 +165,7 @@ function ManageClubs() {
       if (editingId) {
         // UPDATE CLUB
         const response = await fetch(
-          `http://localhost:5000/api/clubs/${editingId}`,
+          `https://campus-flow-backend-6ega.onrender.com/api/clubs/${editingId}`,
           {
             method: "PUT",
             headers: {
@@ -209,7 +209,7 @@ function ManageClubs() {
       } else {
         // CREATE CLUB
         const response = await fetch(
-          "http://localhost:5000/api/clubs",
+          "https://campus-flow-backend-6ega.onrender.com/api/clubs",
           {
             method: "POST",
             headers: {
@@ -299,7 +299,7 @@ function ManageClubs() {
         sessionStorage.getItem("token");
 
       const response = await fetch(
-        `http://localhost:5000/api/clubs/${id}`,
+        `https://campus-flow-backend-6ega.onrender.com/api/clubs/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -370,7 +370,7 @@ function ManageClubs() {
           sessionStorage.getItem("token");
 
         const response = await fetch(
-          `http://localhost:5000/api/club-memberships/${membershipId}/${action}`,
+          `https://campus-flow-backend-6ega.onrender.com/api/club-memberships/${membershipId}/${action}`,
           {
             method: "PUT",
             headers: {

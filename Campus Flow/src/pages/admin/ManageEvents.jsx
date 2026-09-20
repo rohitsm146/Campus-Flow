@@ -46,7 +46,7 @@ function ManageEvents() {
         const token = sessionStorage.getItem("token");
 
         const response = await fetch(
-          "http://localhost:5000/api/events",
+          "https://campus-flow-backend-6ega.onrender.com/api/events",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -99,7 +99,7 @@ function ManageEvents() {
           events.map(async (event) => {
             try {
               const response = await fetch(
-                `http://localhost:5000/api/event-registrations/event/${event._id}`,
+                `https://campus-flow-backend-6ega.onrender.com/api/event-registrations/event/${event._id}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -203,7 +203,7 @@ function ManageEvents() {
       // UPDATE EVENT
       if (editingId) {
         const response = await fetch(
-          `http://localhost:5000/api/events/${editingId}`,
+          `https://campus-flow-backend-6ega.onrender.com/api/events/${editingId}`,
           {
             method: "PUT",
             headers: {
@@ -247,7 +247,7 @@ function ManageEvents() {
       } else {
         // CREATE EVENT
         const response = await fetch(
-          "http://localhost:5000/api/events",
+          "https://campus-flow-backend-6ega.onrender.com/api/events",
           {
             method: "POST",
             headers: {
@@ -335,7 +335,7 @@ function ManageEvents() {
         sessionStorage.getItem("token");
 
       const response = await fetch(
-        `http://localhost:5000/api/events/${id}`,
+        `https://campus-flow-backend-6ega.onrender.com/api/events/${id}`,
         {
           method: "DELETE",
           headers: {

@@ -31,7 +31,7 @@ function ManageComplaints() {
         const token = sessionStorage.getItem("token");
 
         const response = await fetch(
-          "http://localhost:5000/api/complaints",
+          "https://campus-flow-backend-6ega.onrender.com/api/complaints",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -78,7 +78,7 @@ function ManageComplaints() {
       const token = sessionStorage.getItem("token");
 
       const response = await fetch(
-        `http://localhost:5000/api/complaints/${complaintId}/status`,
+        `https://campus-flow-backend-6ega.onrender.com/api/complaints/${complaintId}/status`,
         {
           method: "PUT",
           headers: {

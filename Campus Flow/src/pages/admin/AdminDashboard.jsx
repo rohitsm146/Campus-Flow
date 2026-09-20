@@ -33,19 +33,19 @@ function AdminDashboard() {
           announcementsResponse,
           complaintsResponse,
         ] = await Promise.all([
-          fetch("http://localhost:5000/api/events", {
+          fetch("https://campus-flow-backend-6ega.onrender.com/api/events", {
             headers,
           }),
 
-          fetch("http://localhost:5000/api/clubs", {
+          fetch("https://campus-flow-backend-6ega.onrender.com/api/clubs", {
             headers,
           }),
 
-          fetch("http://localhost:5000/api/announcements", {
+          fetch("https://campus-flow-backend-6ega.onrender.com/api/announcements", {
             headers,
           }),
 
-          fetch("http://localhost:5000/api/complaints", {
+          fetch("https://campus-flow-backend-6ega.onrender.com/api/complaints", {
             headers,
           }),
         ]);

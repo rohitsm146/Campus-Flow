@@ -24,7 +24,7 @@ function StudentDashboard() {
         const token = sessionStorage.getItem("token");
 
         const eventsResponse = await fetch(
-          "http://localhost:5000/api/event-registrations/my",
+          "https://campus-flow-backend-6ega.onrender.com/api/event-registrations/my",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -44,7 +44,7 @@ function StudentDashboard() {
         }
 
         const clubsResponse = await fetch(
-          "http://localhost:5000/api/club-memberships/my",
+          "https://campus-flow-backend-6ega.onrender.com/api/club-memberships/my",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -64,7 +64,7 @@ function StudentDashboard() {
         }
 
         const announcementsResponse = await fetch(
-          "http://localhost:5000/api/announcements",
+          "https://campus-flow-backend-6ega.onrender.com/api/announcements",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -85,7 +85,7 @@ function StudentDashboard() {
         }
 
         const complaintsResponse = await fetch(
-          "http://localhost:5000/api/complaints/my",
+          "https://campus-flow-backend-6ega.onrender.com/api/complaints/my",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -106,7 +106,7 @@ function StudentDashboard() {
         }
 
         const allEventsResponse = await fetch(
-          "http://localhost:5000/api/events",
+          "https://campus-flow-backend-6ega.onrender.com/api/events",
           {
             headers: {
               Authorization: `Bearer ${token}`,

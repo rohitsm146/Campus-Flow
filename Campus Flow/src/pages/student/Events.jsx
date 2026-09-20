@@ -25,7 +25,7 @@ function Events() {
 
         // Get all events
         const eventsResponse = await fetch(
-          "http://localhost:5000/api/events",
+          "https://campus-flow-backend-6ega.onrender.com/api/events",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -46,7 +46,7 @@ function Events() {
 
         // Get student's registered events
         const registrationsResponse = await fetch(
-          "http://localhost:5000/api/event-registrations/my",
+          "https://campus-flow-backend-6ega.onrender.com/api/event-registrations/my",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ function Events() {
       const token = sessionStorage.getItem("token");
 
       const response = await fetch(
-        "http://localhost:5000/api/event-registrations",
+        "https://campus-flow-backend-6ega.onrender.com/api/event-registrations",
         {
           method: "POST",
           headers: {

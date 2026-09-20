@@ -22,7 +22,7 @@ function Announcements() {
         const token = sessionStorage.getItem("token");
 
         const response = await fetch(
-          "http://localhost:5000/api/announcements",
+          "https://campus-flow-backend-6ega.onrender.com/api/announcements",
           {
             headers: {
               Authorization: `Bearer ${token}`,

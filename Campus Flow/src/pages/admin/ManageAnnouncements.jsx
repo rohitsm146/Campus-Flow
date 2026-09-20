@@ -40,7 +40,7 @@ function ManageAnnouncements() {
           sessionStorage.getItem("token");
 
         const response = await fetch(
-          "http://localhost:5000/api/announcements",
+          "https://campus-flow-backend-6ega.onrender.com/api/announcements",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -109,7 +109,7 @@ function ManageAnnouncements() {
       // UPDATE ANNOUNCEMENT
       if (editingId) {
         const response = await fetch(
-          `http://localhost:5000/api/announcements/${editingId}`,
+          `https://campus-flow-backend-6ega.onrender.com/api/announcements/${editingId}`,
           {
             method: "PUT",
             headers: {
@@ -156,7 +156,7 @@ function ManageAnnouncements() {
       // CREATE ANNOUNCEMENT
       else {
         const response = await fetch(
-          "http://localhost:5000/api/announcements",
+          "https://campus-flow-backend-6ega.onrender.com/api/announcements",
           {
             method: "POST",
             headers: {
@@ -243,7 +243,7 @@ function ManageAnnouncements() {
         sessionStorage.getItem("token");
 
       const response = await fetch(
-        `http://localhost:5000/api/announcements/${id}`,
+        `https://campus-flow-backend-6ega.onrender.com/api/announcements/${id}`,
         {
           method: "DELETE",
           headers: {

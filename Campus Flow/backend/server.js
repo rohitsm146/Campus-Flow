@@ -9,18 +9,19 @@ const app = express();
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
 connectDB();
 
-// Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+    ],
   })
 );
+
 app.use(express.json());
 
-// Routes
 const testRoutes = require("./routes/testRoutes");
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
@@ -33,13 +34,23 @@ const complaintRoutes = require("./routes/complaintRoutes");
 app.use("/api/test", testRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
-app.use("/api/event-registrations", eventRegistrationRoutes);
+app.use(
+  "/api/event-registrations",
+  eventRegistrationRoutes
+);
 app.use("/api/clubs", clubRoutes);
-app.use("/api/club-memberships", clubMembershipRoutes);
-app.use("/api/announcements", announcementRoutes);
+app.use(
+  "/api/club-memberships",
+  clubMembershipRoutes
+);
+app.use(
+  "/api/announcements",
+  announcementRoutes
+);
 app.use("/api/complaints", complaintRoutes);
 
-// Start server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(
+    `Server running on http://localhost:${PORT}`
+  );
 });

@@ -33,7 +33,7 @@ function Clubs() {
 
         // GET ALL CLUBS
         const clubsResponse = await fetch(
-          "http://localhost:5000/api/clubs",
+          "https://campus-flow-backend-6ega.onrender.com/api/clubs",
           {
             method: "GET",
             headers: {
@@ -55,7 +55,7 @@ function Clubs() {
 
         // GET MY CLUB MEMBERSHIPS
         const membershipsResponse = await fetch(
-          "http://localhost:5000/api/club-memberships/my",
+          "https://campus-flow-backend-6ega.onrender.com/api/club-memberships/my",
           {
             method: "GET",
             headers: {
@@ -115,7 +115,7 @@ function Clubs() {
       }
 
       const response = await fetch(
-        "http://localhost:5000/api/club-memberships",
+        "https://campus-flow-backend-6ega.onrender.com/api/club-memberships",
         {
           method: "POST",
           headers: {
@@ -170,7 +170,7 @@ function Clubs() {
         // Otherwise refresh memberships
         const membershipsResponse =
           await fetch(
-            "http://localhost:5000/api/club-memberships/my",
+            "https://campus-flow-backend-6ega.onrender.com/api/club-memberships/my",
             {
               method: "GET",
               headers: {
