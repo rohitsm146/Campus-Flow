@@ -1,41 +1,36 @@
-import { Link } from "react-router-dom";
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-function Login() {
-  return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h1>Campus Flow</h1>
-        <p className="auth-subtitle">Welcome back!</p>
+  color: #222;
+  background: #f5f7fb;
 
-        <form>
-          <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-            />
-          </div>
-
-          <button type="submit" className="primary-btn">
-            Login
-          </button>
-        </form>
-
-        <p className="auth-footer">
-          Don't have an account?{" "}
-          <Link to="/register">Register</Link>
-        </p>
-      </div>
-    </div>
-  );
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-export default Login;
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
